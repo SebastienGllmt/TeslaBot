@@ -131,6 +131,8 @@ public class TeslaInput {
 					rtrn = action.notifyChats(formName(args,1));
 				}else if(args[0].equals("!done")){
 					rtrn = action.doneAction(formName(args,1));
+				}else if(args[0].equals("!choose")){
+					rtrn = action.choseElement(formName(args, 1));
 				}else if(args[0].equals("!conch")){
 					rtrn = action.getRndmLine("magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
 				}else if(args[0].equals("!summon")){

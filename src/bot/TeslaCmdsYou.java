@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -495,5 +496,20 @@ public class TeslaCmdsYou {
 	    } finally {
 	        is.close();
 	    }
+	}
+
+	public String choseElement(String formName) {
+		String[] elements = formName.split(" ");
+		int length = elements.length;
+		for(int i=0; i<length; i++){
+			if(elements[i].endsWith(",")){
+				elements[i] = elements[i].substring(0, elements[i].length()-1);
+			}
+		}
+		Random r = new Random();
+		int index = r.nextInt(length);
+		String result = elements[index] + ", I choose you!";
+		return result;
+		
 	}
 }

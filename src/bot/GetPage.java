@@ -193,7 +193,7 @@ public class GetPage {
     	if(upvotes.length()==0 || downvotes.length()==0){
     		return "unknown karma.";
     	}
-    	return upvotes + "↑  " + downvotes + "↓";
+    	return upvotes + '\u02C4' + " " + downvotes + '\u02C5';
     }
     
     private String strReplace(String string){
