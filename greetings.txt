@@ -1,0 +1,9 @@
+Why hello there.
+
+My name is Tesla Bot. I am your friendly Skype Bot here to enhance your Skype experience.
+
+I look forward to improving your quality of life, even from beyond the grave.
+
+I will NOT WORK CORRECTLY in one on one chats. This is a problem with Skype's API and not on my side.
+
+Type in !help for a list of commands

@@ -1,0 +1,201 @@
+> MESSAGE 16297 STATUS SENDING
+> CHAT #blackduck606/$3ee9981957bf4448 ACTIVITY_TIMESTAMP 1346176235
+> MESSAGE 16297 STATUS SENT
+
+
+#blackduck606/$3ee9981957bf4448
+USE TESLA QUOTES
+
+~~~CALL <target>
+~~~GET CALL <id> <property>
+~~~SET CALL <joining_id> JOIN_CONFERENCE <master_id>
+    <joining_id> – call ID (numeric) to join into;
+    <master_id> – master call ID, where is another call’s ID.
+	It is possible to initate a conference with the CALL target1, target2 command
+
+
+~~~CHAT CREATE [<target>, <target>*]
+	Response: CHAT <chat_id> STATUS <value>
+
+
+~~~CHATMESSAGE <chatID> <text>
+
+
+~~~SET CHATMESSAGE <message ID> BODY <new message>
+	This edits a message
+~~~SET USER <target> <property_name>
+~~~SET PROFILE MOOD_TEXT
+~~~SET PROFILE RICH_MOOD_TEXT
+~~~SET RINGTONE <id> <filePath + fileName>[:idx]
+	id – ringtone id. In the current release, the is always ‘1’
+	fileName:idx – ringtone file may either be .wav or .skype file format. IDX refers to the content number in .skype file formats (0,..)
+
+
+~~~ALTER CHAT <chat_id> SETTOPIC <topic>
+~~~ALTER CHAT <chat_id> SETTOPICXML <topic>
+	<BLINK></BLINK>
+	<B></B>
+	<I></I>
+	<U></U>
+	Smiley: <SS type="smile">:-)</SS>
+~~~ALTER CHAT <chat_id> BOOKMARK
+
+
+~~~GET CALL <id> <property>
+~~~GET MESSAGE <id> <property>
+~~~GET CHATMESSAGE <messageID> <prop>
+~~~GET CHAT <chatID> <property>
+~~~GET CHATMEMBER <id> <property>
+	See CHATMEMBER object
+SEARCH FRIENDS | CALLS [<target>] | ACTIVECALLS | ACTIVECHATS | RECENTCHATS | BOOKMARKEDCHATS | CHATMESSAGES [<target>] | ACTIVEFILETRANSFERS
+~~~GET USER <user_id> <property_name>
+~~~GET CURRENTUSER
+	returns username
+~~~GET USERSTATUS
+	returns user status (online, busy, etc)
+~~~GET PROFILE <property>
+~~~GET USER <skypename> RICH_MOOD_TEXT 
+~~~GET CONNSTATUS
+~~~GET USER <skypename> AVATAR 1 <filename>
+
+
+
+~~~Focus
+	The FOCUS brings the Skype window into focus on screen (on top).
+~~~Minimize
+	This command minimizes the main Skype window into the system tray.
+
+~~~OPEN ADDAFRIEND [<username>]
+~~~OPEN IM <username> [<message>]
+	This command opens the chat window with prefilled message.
+~~~OPEN FILETRANSFER <username>[, <username>]*[ IN <folder>]
+~~~OPEN PROFILE
+	This command opens the profile window for the current user.
+~~~OPEN USERINFO <skypename>
+~~~OPEN CONFERENCE
+
+
+~~~BTN_RELEASED <key> | BTN_PRESSED <key>
+	BTN_PRESSED command does not actually do anything useful. BTN_RELEASED command can be used to simulate keyboard events in Skype UI.
+
+
+==CALL object==
+
+PARTNER_HANDLE – for example CALL 17 PARTNER_HANDLE mike. In case of SkypeOut and SkypeIn calls this property contains the PSTN number of remote party, prefixed by countrycode (+123456789).
+PARTNER_DISPNAME – for example CALL 17 PARTNER_DISPNAME Mike Mann
+
+STATUS – call status, for example: CALL 17 STATUS FAILED . Possible values:
+
+    UNPLACED – call was never placed
+    ROUTING – call is currently being routed
+    EARLYMEDIA – with pstn it is possible that before a call is established, early media is played. For example it can be a calling tone or a waiting message such as all operators are busy.
+    FAILED – call failed – try to get a FAILUREREASON for more information.
+    RINGING – currently ringing
+    INPROGRESS – call is in progress
+    ONHOLD – call is placed on hold
+    FINISHED – call is finished
+    MISSED – call was missed
+    REFUSED – call was refused
+    BUSY – destination was busy
+    CANCELLED (Protocol 2)
+
+CONF_PARTICIPANTS_COUNT – number of non-hosts in the case of a conference call. Always 0 for host.
+CONF_PARTICIAPNT n – the username of the nth participant in a conference call, the call type and status and the displayname of participants who are not the host. For example: CALL 59 CONF_PARTICIPANT 1 echo123 INCOMING_P2P INPROGRESS Echo Test Service .
+VIDEO_SEND_STATUS and VIDEO_RECEIVE_STATUS – possible values of this property are:
+
+    NOT_AVAILABLE – the client does not have video capability because video is disabled or a webcam is unplugged).
+    AVAILABLE – the client is video-capable but the video is not running (can occur during a manual send).
+    STARTING – the video is sending but is not yet running at full speed.
+    REJECTED – the receiver rejects the video feed (can occur during a manual receive).
+    RUNNING – the video is actively running.
+    STOPPING – the active video is in the process of stopping but has not halted yet.
+    PAUSED – the video call is placed on hold.
+
+JOIN_CONFERENCE – joins call with another call into conference. VALUE is the ID of another call.
+
+==GROUP object==
+
+CUSTOM_GROUP_ID – a persistent ID for custom groups which can be empty at the start of group creation.
+DISPLAYNAME – the display name of the group (read-write)
+NROFUSERS – the number of contacts in this group (read-only)
+NROFUSERS_ONLINE – the number of contacts online in this group (read-only)
+USERS – the list of contacts in the group (read-only)
+
+==USER object==
+
+    HANDLE – username, for example: USER pamela HANDLE pamela .
+    FULLNAME – user’s full name, for example: USER pamela FULLNAME Jane Doe .
+    BIRTHDAY – user’s birth date in YYYYMMDD format, for example: USER bitman BIRTHDAY 19780329 .
+    COUNTRY – name of country, for example: USER mike COUNTRY Estonia . In protocol 4 with the ISO 3166 prefix, example: USER mike COUNTRY ee Estonia .
+    PROVINCE – example: USER mike PROVINCE Harjumaa .
+    CITY – example: USER mike CITY Tallinn .
+    HOMEPAGE – example: USER mike HOMEPAGE http://www.joltid.com .
+    ABOUT – example: USER mike ABOUT I am a nice person .
+    ONLINESTATUS – user online status, for example: USER mike ONLINESTATUS ONLINE . Possible values:
+        UNKNOWN – unknown user.
+        OFFLINE – user is offline (not connected). Will also be returned if current user is not authorized by other user to see his/her online status.
+        ONLINE – user is online.
+        AWAY – user is away (has been inactive for certain period).
+        NA – user is not available.
+        DND – user is in “Do not disturb” mode.
+    LASTONLINETIMESTAMP – UNIX timestamp, available only for offline user. Example USER mike LASTONLINETIMESTAMP 1078959579 .
+    MOOD_TEXT – mood text for user (mood text is only visible to authorised users; visible in Skype for Windows 2.0).
+    RICH_MOOD_TEXT – advanced version of user’s mood message. See SET PROFILE RICH_MOOD_TEXT command for more information. Introduced in API version 3.0
+    TIMEZONE <offset> – time offset from GMT in minutes; visible in Skype for Windows 2.0.
+
+    DISPLAYNAME – By default this property is empty. If a value is assigned to this property with SET <skypename> DISPLAYNAME <value> then that value will be displayed in Skype UI instead of user’s FULLNAME.
+
+==CHAT object==
+
+    NAME – chat ID, for example CHAT #test_l/$6a072ce5537c4044 NAME #test_l/$6a072ce5537c4044
+    TIMESTAMP – time when chat was created, for example CHAT #test_l/$6a072ce5537c4044 TIMESTAMP 1078958218
+    ADDER – user who added the current user to chat, for example CHAT 1078958218 ADDER k6rberebane
+    STATUS – chat status, for example CHAT #test_l/$6a072ce5537c4044 STATUS MULTI_SUBSCRIBED . Possible values:
+        LEGACY_DIALOG – old style IM
+        DIALOG – 1:1 chat.
+        MULTI_SUBSCRIBED – participant in chat
+        UNSUBSCRIBED – left chat
+    MEMBERS – all users who have been there, for example CHAT #test_l/$6a072ce5537c4044 MEMBERS k6rberebane test test_2 test_3
+    TOPIC – chat topic. Example: CHAT #test_l/$6a072ce5537c4044 TOPIC API testimine
+    TOPICXML – set when a chat topic contains XML formatting elements (topic was changed with ALTER CHAT SETTOPICXML command) This property works in parallel with TOPIC property – when TOPICXML is set, the value is stripped of XML tags and updated in TOPIC.
+    CHATMESSAGES – all messages IDs in this chat, for example CHAT #test_l/$6a072ce5537c4044 CHATMESSAGES 34, 35, 36, 38, 39
+    ACTIVEMEMBERS – members who have stayed in chat, for example CHAT #test_l/$6a072ce5537c4044 ACTIVEMEMBERS k6rberebane test_2 test_3
+    FRIENDLYNAME – name shown in chat window title, for example CHAT #test_l/$6a072ce5537c4044 FRIENDLYNAME Test Test XX | tere ise ka
+    CHATMESSAGES – list of chatmessage identifiers
+    RECENTCHATMESSAGES – list of missed/recent chatmessage identifiers
+    BOOKMARKED – TRUE|FALSE (added in protocol version 6 / Skype API version 2.5)
+
+Following properties were added to CHAT object in protocol 7 (API version 3.0):
+
+    MEMBEROBJECTS – contains the list of CHATMEMBER object IDs. Refer to
+        CHATMEMBER object for list of properties
+        GET CHATMEMBER command on how to access those properties.
+        GET CHAT MEMBEROBJECTS command on how to get a list of chatmember object IDs for a given chat.
+    OPTIONS – bitmap of chat options. Refer to ALTER CHAT SETOPTIONS command for more information.
+    ACTIVITY_TIMESTAMP – the UNIX timestamp of last activity.
+
+==CHATMEMBER object==
+
+CHATNAME
+IDENTITY
+ROLE
+IS_ACTIVE
+
+==CHATMESSAGE object==
+
+TIMESTAMP – time when message was sent (UNIX timestamp), for example MESSAGE 21 TIMESTAMP 1078958218
+FROM_HANDLE – skypename of the originator of the chatmessage.
+FROM_DISPNAME – displayed name of the originator of the chatmessage.
+TYPE – message type, for example MESSAGE 21 TYPE TEXT . Possible values:
+
+    SETTOPIC – change of chat topic
+    SAID – IM
+    ADDEDMEMBERS – invited someone to chat
+    SETOPTIONS – system messages that are sent when chat options are changed. Refer to ALTER CHAT SETOPTIONS command for more information. Added in protocol 7.
+    SETPICTURE – system messages that are sent when a chat member has changed the public chat topic picture. Added in protocol 7.
+    JOINEDASAPPLICANT – notification message that gets sent in a public chat with JOINERS_BECOME_APPLICANTS options, when a new user joins the chat. See ALTER CHAT SETOPTIONS command for more information on chat options. Added in protocol 7.
+
+CHATNAME – chat that includes the message, for example #test_3/$b17eb511457e9d20
+USERS – people added to chat
+BODY – message text. Note that this property was read-only prior to API version 3.0
+

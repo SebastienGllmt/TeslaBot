@@ -1,0 +1,11 @@
+Hello, <user>.
+
+ My name is Nikola Tesla, your friendly Skype Bot.
+
+ Your friend, <friend>, has requested that I add you as a friend.
+
+ This will allow him to send me commands using your display name and also allows you to send commands to me as you wish.
+
+ Unfortunately, I do not work very well in one on one conversations, so commands might not be recognized.
+
+ Type in !help to get a list of available commands.
