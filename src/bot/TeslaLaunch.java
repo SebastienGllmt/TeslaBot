@@ -47,6 +47,8 @@ public class TeslaLaunch extends Shell {
         final GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 2;
         setLayout(gridLayout);
+        
+        final TeslaInput input = new TeslaInput();
 
         final Text fromSkype = new Text(this, SWT.V_SCROLL | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
         
@@ -61,7 +63,7 @@ public class TeslaLaunch extends Shell {
                     		String msg = appended.substring(3);
                     		if(appended.contains("<-")){
 								try {
-									TeslaInput.getInput(msg);
+									input.getInput(msg);
 								} catch (ConnectorException e) {
 									e.printStackTrace();
 								} catch (SkypeException e) {

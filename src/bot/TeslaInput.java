@@ -1,6 +1,7 @@
 package bot;
 
 import java.awt.Toolkit;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -8,18 +9,20 @@ import com.skype.Call;
 import com.skype.Chat;
 import com.skype.ChatMessage;
 import com.skype.ContactList;
+import com.skype.Skype;
 import com.skype.SkypeException;
 import com.skype.connector.ConnectorException;
 
 public class TeslaInput {
 
-	static String chatMessageID;
-	static String status;
-	static String[] cmd;
-	static String roomName;
-	static boolean justAdded;
+	private String chatMessageID;
+	private String status;
+	private String[] cmd;
+	private boolean justAdded;
 	
-	public static void getInput(String input) throws ConnectorException, SkypeException, IOException{
+	Radio radio = new Radio();
+	
+	public void getInput(String input) throws ConnectorException, SkypeException, IOException{
 		if(input.equals("PONG")){
 			return;
 		}
@@ -38,15 +41,28 @@ public class TeslaInput {
 						readMessage(chatMessageID);
 					}
 				}catch(Exception e){
+					System.out.println("Error in reading message.");
 					return;
 				}
 			}
 		}else if(cmd[0].equals("CALL")){
-			try{
-				Call call = new Call(cmd[1]);
-				call.finish();
-			}catch(Exception e){
-				return;
+			if(cmd.length == 4){
+				if(cmd[3].equals("RINGING")){
+					try{
+						Call call = new Call(cmd[1]);
+						String id = call.getId();
+						String callID = radio.getCallID();
+						if(!id.equals(callID) && !radio.isPlaying()){
+							call.finish();
+						}
+					}catch(Exception e){
+					return;
+					}
+				}else if(cmd[2].startsWith("VAA")){
+					if(cmd[3].equals("FALSE")){
+						radio.songOver();
+					}
+				}
 			}
 		}else if(cmd[0].equals("CHAT")){
 			try{
@@ -76,7 +92,7 @@ public class TeslaInput {
 			}
 		}
 	}
-	private static void readMessage(String msgID) throws ConnectorException, SkypeException, IOException{
+	private void readMessage(String msgID) throws ConnectorException, SkypeException, IOException{
 		ChatMessage msg = new ChatMessage(msgID);
 		String body = msg.getContent();
 		String speaker = msg.getSenderDisplayName();
@@ -135,6 +151,8 @@ public class TeslaInput {
 					rtrn = action.choseElement(formName(args, 1));
 				}else if(args[0].equals("!conch")){
 					rtrn = action.getRndmLine("magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
+				}else if(args[0].equals("!radio")){
+					rtrn = radio.getCommand(args, msg.getChat());
 				}else if(args[0].equals("!summon")){
 					msg.getChat().openChat();
 					Toolkit.getDefaultToolkit().beep();
@@ -173,7 +191,7 @@ public class TeslaInput {
 			}
 		}
 	}
-	private static String formName(String[] args, int start){
+	private String formName(String[] args, int start){
 		String name = "";
 		for(int i=start;i<args.length;i++){
 			if(i<args.length-1){
