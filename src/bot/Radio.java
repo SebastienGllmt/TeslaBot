@@ -2,6 +2,8 @@ package bot;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.skype.Call;
@@ -15,8 +17,13 @@ import com.skype.SkypeException;
  * @author Sebastien 
  * TODO: 
  * Pull music from a repository 
- * Better way to end the radio function
+ * Better way to convert music
  * Add to help file
+ * Make starting directory modifiable
+ * Add more intro songs and pick a random one
+ * Add a mute feature
+ * Fix start over/play for groups (?)
+ * Get if radio is playing or not
  */
 
 public class Radio {
@@ -27,25 +34,34 @@ public class Radio {
 	private String songTitle = "";
 	private String mode = "repeat";
 	private boolean playing = false;
-	private String callID = "";
-	private Call call;
+	private Call[] calls;
 
 	public String getCommand(String[] cmds, Chat chat) throws SkypeException{
-		String rtrn = "Invalid command.";
+		String rtrn = "Invalid command or radio not running.";
 		if(cmds.length == 2){
-			if(cmds[1].equalsIgnoreCase("on")){
+			if(cmds[1].equals("on")){
 				boolean success = play(chat);
 				if(success){
 					rtrn = "Radio started.";
 				}else{
 					rtrn = "Radio already on.";
+					if(calls.length == 0){
+						rtrn = "Can not start radio when a call is already going on.";
+					}
 				}
-			}else if(cmds[1].equalsIgnoreCase("off")){
-				boolean success = stopRadio();
+			}else if(cmds[1].equals("off")){
+				boolean success = resetRadio();
 				if(success){
 					rtrn = "Radio stopped.";
 				}else{
 					rtrn = "Radio failed to stop.";
+				}
+			}else if(cmds[1].equals("status")){
+				rtrn = "Tesla Wireless Radio is currently ";
+				if(playing){
+					rtrn += "online.";
+				}else{
+					rtrn += "offline.";
 				}
 			}
 		}
@@ -54,24 +70,26 @@ public class Radio {
 				if(cmds[1].equals("list")){
 					rtrn = listDir();
 				}else if(cmds[1].equals("back")){
-					String[] path = dynamicDir.split("\\\\");
-					StringBuffer sb = new StringBuffer();
-					for(int i=0; i<path.length-1; i++){
-						sb.append(path[i] + "\\");
+					if(!dynamicDir.isEmpty()){
+						dynamicDir = dynamicDir.substring(0, dynamicDir.length()-1); //removes the backslash at the end
 					}
-					dynamicDir = sb.toString();
-					if(dynamicDir.isEmpty()){
-						rtrn = "Returned to root directory";
+					int index = dynamicDir.lastIndexOf("\\");
+					String msg;
+					if(index != -1){
+						dynamicDir = dynamicDir.substring(0, index) + "\\";
+						msg = "Directory shifted to " + getDirTitle(true);
 					}else{
-						rtrn = "Directory shifted to " + dynamicDir;
+						dynamicDir = "";
+						msg = "Directory shifted to root directory";
 					}
+					rtrn = msg;
 				}else if(cmds[1].equals("next")){
 					getNextTrack();
-					playSong(false);
+					allPlaySong(false);
 					rtrn = "Now playing " + songTitle;
 				}else if(cmds[1].equals("set")){
 					updateDir();
-					rtrn = "Updated directory to " + secondaryDir;
+					rtrn = "Updated directory to " + getDirTitle(false);
 				}
 			}
 			if(cmds.length == 3){
@@ -90,18 +108,18 @@ public class Radio {
 							if(command.equals("play")){
 								list = getTracks(true);
 								songTitle = list[id];
-								playSong(true);
+								allPlaySong(true);
 								rtrn = "Now playing " + songTitle;
 							}else{
 								list = getDirectories(true);
-								dynamicDir = list[id] + "\\";
+								dynamicDir += list[id] + "\\";
 								rtrn = "Directory shifted to " + dynamicDir;
 							}
 						}else{
-							rtrn = "Invalid track ID.";
+							rtrn = "Invalid track or directory.";
 						}
 					}catch(NumberFormatException e){
-						rtrn = "Invalid track ID.";	
+						rtrn = "Invalid track or directory.";	
 					}
 				}else if(cmds[1].equals("mode")){
 					boolean success = setMode(cmds[2]);
@@ -110,75 +128,79 @@ public class Radio {
 					}else{
 						rtrn = "Invalid mode.";
 					}
+				}else if(cmds[1].equals("get")){
+					if(cmds[2].equals("track")){
+						rtrn = songTitle + " is currently playing in " + getDirTitle(false);
+					}else if(cmds[2].equals("dir")){
+						rtrn = "Currently playing from " + getDirTitle(false) + " and browsing through " + getDirTitle(true);
+					}else if(cmds[2].equals("mode")){
+						rtrn = "Current mode: " + mode;
+					}else if(cmds[2].equals("listeners")){
+						int numCalls=0;
+						for(Call call : calls){
+							if(callActive(call)){
+								numCalls++;
+							}
+						}
+						if(numCalls > 1){
+							rtrn = "There are currently " + numCalls + " listeners.";
+						}else{
+							rtrn = "There is currently " + numCalls + " listener";
+						}
+					}
 				}else{
-					rtrn = "Invalid use of command " + cmds[2];
+					rtrn = "Invalid use of command " + cmds[1] + cmds[2];
 				}
 			}
 		}
 			
 		return rtrn;
 	}
+	
+	private String getDirTitle(boolean dynamic){
+		String dir;
+		if(dynamic){
+			dir = dynamicDir;
+		}else{
+			dir = secondaryDir;
+		}
+		if(dir.isEmpty()){
+			dir = "root directory";
+		}
+		return dir;
+	}
 
 	public boolean isPlaying() {
 		return playing;
 	}
 
-	public void resetRadio() {
+	public boolean resetRadio() {
 		playing = false;
-		callID = "";
+		songTitle = "";
+		mode = "repeat";
 		secondaryDir = "";
 		dynamicDir = "";
-	}
-
-	public boolean stopRadio() throws SkypeException {
-		if (callID.isEmpty()) {
-			return false;
-		}
-		if (call == null) {
-			return false;
-		}
-		resetRadio();
-		try {
-			Call[] calls = Skype.getAllActiveCalls();
-			for(Call call : calls){
-				call.finish();
+		for(int i=0; i<calls.length; i++){
+			try {
+				if(callActive(calls[i])){
+					calls[i].hangup();
+				}
+			} catch (SkypeException e) {
+				e.printStackTrace();
+				return false;
 			}
-		} catch (SkypeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		calls = null;
 		return true;
 	}
 
 	public boolean play(Chat chat) throws SkypeException {
-		if (!callID.isEmpty()) {
-			return false;
-		}
 		playing = true;
-		callID = "LOADING";
 
-		Skype.callChat(chat.getId());
-		Call[] calls = Skype.getAllCalls();
-		call = null;
-		for (Call skypeCall : calls) {
-			Status status = skypeCall.getStatus();
-			if (status == Status.UNPLACED || status == Status.RINGING
-					|| status == Status.ROUTING) {
-				call = skypeCall;
-				break;
-			}
-		}
-		if (call == null) {
-			stopRadio();
-		}
-		callID = call.getId();
+		calls = Skype.callChat(chat.getId());
 		songTitle = "callIntro.wav";
-		playSong(true);
+		allPlaySong(true);
 		return true;
-	}
-
-	public String getCallID() {
-		return callID;
 	}
 	
 	public void updateDir(){
@@ -187,22 +209,44 @@ public class Radio {
 		}
 	}
 
-	public boolean playSong(boolean updateDirectory) {
+	public void allPlaySong(boolean updateDirectory) {
 		if (updateDirectory) {
 			updateDir();
 		}
+		for(int i=0; i<calls.length; i++){
+			playSong(i);
+		}
+	}
+	
+	private void playSong(int callerID){
+		File f = getTrackPath();
+		try {
+			if(callActive(calls[callerID])){
+				calls[callerID].setFileInput(f);
+			}else{
+				resetRadio();
+			}
+		} catch (SkypeException e) {
+			System.out.println("Failed to attach track at call ID " + callerID + " at track " + f.getAbsolutePath());
+			e.printStackTrace();
+		}
+	}
+	
+	private File getTrackPath(){
 		File f = new File(mainDir + secondaryDir + songTitle);
 		if (!f.exists()) {
 			System.out.println("Song does not exist at " + f.getAbsolutePath());
-			return false;
+			return null;
 		}
-		try {
-			System.out.println("Song filepath: " + f.getAbsolutePath());
-			call.setFileInput(f);
-		} catch (SkypeException e) {
-			return false;
+		return f;
+	}
+	
+	public boolean callActive(Call call) throws SkypeException{
+		Status status = call.getStatus();
+		if(status == Status.UNPLACED || status == Status.INPROGRESS || status == Status.RINGING || status == Status.ROUTING){
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	public String listDir() {
@@ -210,19 +254,25 @@ public class Radio {
 		String[] files = getDirectories(true);
 
 		StringBuilder sb = new StringBuilder("Listing tracks..." + '\n');
-		for (int i = 0; i < songs.length; i++) {
-			String trackID = Integer.toString(i);
-			if (trackID.length() == 1) {
-				trackID = "0" + i;
+		if(songs == null){
+			sb.append("No tracks found.");
+		}else{
+			for (int i = 0; i < songs.length; i++) {
+				String trackID = Integer.toString(i);
+				if (trackID.length() == 1) {
+					trackID = "0" + i;
+				}
+				sb.append("Track " + trackID + " : " + songs[i] + '\n');
 			}
-			sb.append("Track " + trackID + " : " + songs[i] + '\n');
 		}
-		for (int i = 0; i < files.length; i++) {
-			String trackID = Integer.toString(i);
-			if (trackID.length() == 1) {
-				trackID = "0" + i;
+		if(files != null){
+			for (int i = 0; i < files.length; i++) {
+				String folderID = Integer.toString(i);
+				if (folderID.length() == 1) {
+					folderID = "0" + i;
+				}
+				sb.append("Folder " + folderID + " : " + files[i] + "\\" + '\n');
 			}
-			sb.append("Folder " + trackID + " : " + files[i] + "\\" + '\n');
 		}
 
 		sb.substring(0, sb.length() - 2);
@@ -274,18 +324,26 @@ public class Radio {
 		return true;
 	}
 
-	public void songOver() {
-		if(mode.equals("repeat")){
-			checkSong();
-			playSong(false);
-		}else if(mode.equals("shuffle")){
-			getRandomTrack();
-			playSong(false);
-		}else if(mode.equals("linear")){
-			getNextTrack();
-			playSong(false);
+	public void songOver(String callID) {
+		int callerID = -1;
+		if(calls == null){
+			return;
+		}
+		for(int i=0; i<calls.length; i++){
+			if(calls[i].getId().equals(callID)){
+				callerID = i;
+				break;
+			}
 		}
 		
+		if(mode.equals("repeat")){
+			checkSong();
+		}else if(mode.equals("shuffle")){
+			getRandomTrack();
+		}else if(mode.equals("linear")){
+			getNextTrack();
+		}
+		playSong(callerID);		
 	}
 	
 	private void checkSong(){
@@ -300,12 +358,16 @@ public class Radio {
 	
 	private void getRandomTrack(){
 		String[] tracks = getTracks(false);
-		Random r = new Random();
-		int id;
-		do{
-			id = r.nextInt(tracks.length);
-		}while(songTitle.equals(tracks[id]));
-		songTitle = tracks[id];
+		if(tracks.length == 1){
+			songTitle = tracks[0];
+		}else{
+			Random r = new Random();
+			int id;
+			do{
+				id = r.nextInt(tracks.length);
+			}while(songTitle.equals(tracks[id]));
+			songTitle = tracks[id];
+		}
 	}
 	
 	private void getNextTrack(){

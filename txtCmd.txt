@@ -7,6 +7,7 @@ List of commands
 !ping <website> - Returns the ping in milliseconds of a website.
 !poke <username> - Sends a PM to a given user.
 !quote - Returns a random quote from Nikola Tesla.
+!radio - Type in "!radio help" for more information.
 !roll <number> - Returns a number from 1 to <number>.
 !search <text> - Returns a Google search of a given query.
 !slap <username> - Slaps a user in a random way to show him your discontent.

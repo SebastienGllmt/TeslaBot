@@ -239,7 +239,7 @@ public class TeslaCmdsYou {
 			con.disconnect();    
 		}  
 	}
-	public void getHelp() throws SkypeException{
+	public void getFullFile(String file) throws SkypeException{
 		getUserByName(speaker);
 		String exception = Exception(speaker, true);
 		if(!exception.equals("")){
@@ -247,7 +247,7 @@ public class TeslaCmdsYou {
 		}
 		User user = members[targetID];
 		try{
-			user.chat().send(getFileInfo("txtCmd.txt"));
+			user.chat().send(getFileInfo(file));
 		}catch (Exception e){
 			user.chat().send("I could not find the help file.");
 		}
@@ -481,7 +481,7 @@ public class TeslaCmdsYou {
 	public static String getFileInfo(String filename) throws IOException {
 	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
 	    try {
-	        byte[] c = new byte[1024];
+	        byte[] c = new byte[is.available()];
 	        int count = 1; //start at first line
 	        int readChars = 0;
 	        while ((readChars = is.read(c)) != -1) {

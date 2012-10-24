@@ -41,6 +41,7 @@ public class TeslaInput {
 						readMessage(chatMessageID);
 					}
 				}catch(Exception e){
+					e.printStackTrace();
 					System.out.println("Error in reading message.");
 					return;
 				}
@@ -50,9 +51,7 @@ public class TeslaInput {
 				if(cmd[3].equals("RINGING")){
 					try{
 						Call call = new Call(cmd[1]);
-						String id = call.getId();
-						String callID = radio.getCallID();
-						if(!id.equals(callID) && !radio.isPlaying()){
+						if(!radio.isPlaying()){
 							call.finish();
 						}
 					}catch(Exception e){
@@ -60,7 +59,7 @@ public class TeslaInput {
 					}
 				}else if(cmd[2].startsWith("VAA")){
 					if(cmd[3].equals("FALSE")){
-						radio.songOver();
+						radio.songOver(cmd[1]);
 					}
 				}
 			}
@@ -138,7 +137,7 @@ public class TeslaInput {
 					rtrn = action.getRndmLine("TeslaQuotes.txt");
 				}else if(args[0].equals("!help")){
 					rtrn = "Help has been delivered to you personally.";
-					action.getHelp();
+					action.getFullFile("txtCmd.txt");
 				}else if(args[0].equals("!add")){
 					rtrn = action.addFriends(formName(args,1));
 				}else if(args[0].equals("!spam")){
@@ -152,7 +151,11 @@ public class TeslaInput {
 				}else if(args[0].equals("!conch")){
 					rtrn = action.getRndmLine("magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
 				}else if(args[0].equals("!radio")){
-					rtrn = radio.getCommand(args, msg.getChat());
+					if(args.length > 1 && args[1].equals("help")){
+						action.getFullFile("radioHelp.txt");
+					}else{
+						rtrn = radio.getCommand(args, msg.getChat());
+					}
 				}else if(args[0].equals("!summon")){
 					msg.getChat().openChat();
 					Toolkit.getDefaultToolkit().beep();
