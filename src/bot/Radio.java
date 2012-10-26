@@ -2,14 +2,11 @@ package bot;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import com.skype.Call;
 import com.skype.Call.Status;
 import com.skype.Chat;
-import com.skype.Skype;
 import com.skype.SkypeException;
 
 /**
@@ -34,19 +31,21 @@ public class Radio {
 	private String songTitle = "";
 	private String mode = "repeat";
 	private boolean playing = false;
-	private Call[] calls;
+	private boolean isListening = false;
+	private Call call = null;
 
 	public String getCommand(String[] cmds, Chat chat) throws SkypeException{
 		String rtrn = "Invalid command or radio not running.";
 		if(cmds.length == 2){
 			if(cmds[1].equals("on")){
-				boolean success = play(chat);
-				if(success){
-					rtrn = "Radio started.";
+				if(isListening){
+					rtrn = "Awaiting call.";
 				}else{
-					rtrn = "Radio already on.";
-					if(calls.length == 0){
-						rtrn = "Can not start radio when a call is already going on.";
+					if(!playing){
+						isListening = true;
+						rtrn = "Awaiting call.";
+					}else{
+						rtrn = "Radio already on.";
 					}
 				}
 			}else if(cmds[1].equals("off")){
@@ -61,7 +60,12 @@ public class Radio {
 				if(playing){
 					rtrn += "online.";
 				}else{
-					rtrn += "offline.";
+					rtrn += "offline";
+					if(isListening){
+						rtrn += " and listening.";
+					}else{
+						rtrn += ".";
+					}
 				}
 			}
 		}
@@ -85,7 +89,7 @@ public class Radio {
 					rtrn = msg;
 				}else if(cmds[1].equals("next")){
 					getNextTrack();
-					allPlaySong(false);
+					playSong(false);
 					rtrn = "Now playing " + songTitle;
 				}else if(cmds[1].equals("set")){
 					updateDir();
@@ -108,7 +112,7 @@ public class Radio {
 							if(command.equals("play")){
 								list = getTracks(true);
 								songTitle = list[id];
-								allPlaySong(true);
+								playSong(true);
 								rtrn = "Now playing " + songTitle;
 							}else{
 								list = getDirectories(true);
@@ -116,7 +120,7 @@ public class Radio {
 								rtrn = "Directory shifted to " + dynamicDir;
 							}
 						}else{
-							rtrn = "Invalid track or directory.";
+							rtrn = "Invalid use of " + command + ". Track or directory IDs must be used from !radio list";
 						}
 					}catch(NumberFormatException e){
 						rtrn = "Invalid track or directory.";	
@@ -136,12 +140,7 @@ public class Radio {
 					}else if(cmds[2].equals("mode")){
 						rtrn = "Current mode: " + mode;
 					}else if(cmds[2].equals("listeners")){
-						int numCalls=0;
-						for(Call call : calls){
-							if(callActive(call)){
-								numCalls++;
-							}
-						}
+						int numCalls=Integer.parseInt(call.getParticipantsCount());
 						if(numCalls > 1){
 							rtrn = "There are currently " + numCalls + " listeners.";
 						}else{
@@ -173,33 +172,44 @@ public class Radio {
 	public boolean isPlaying() {
 		return playing;
 	}
+	public boolean isListening(){
+		return isListening;
+	}
+	public Call getCall(){
+		return call;
+	}
 
 	public boolean resetRadio() {
+		System.out.println("Radio reset");
 		playing = false;
+		isListening = false;
 		songTitle = "";
 		mode = "repeat";
 		secondaryDir = "";
 		dynamicDir = "";
-		for(int i=0; i<calls.length; i++){
+		if(call == null){
+			return true;
+		}else{
 			try {
-				if(callActive(calls[i])){
-					calls[i].hangup();
+				if(isActive(call)){
+					call.hangup();
 				}
 			} catch (SkypeException e) {
 				e.printStackTrace();
-				return false;
 			}
+			call = null;
 		}
-		calls = null;
 		return true;
 	}
 
-	public boolean play(Chat chat) throws SkypeException {
+	public boolean play(Call newCall) throws SkypeException {
+		System.out.println("Radio begin");
 		playing = true;
-
-		calls = Skype.callChat(chat.getId());
+		call = newCall;
+		call.answer();
 		songTitle = "callIntro.wav";
-		allPlaySong(true);
+		playSong(false);
+		isListening = false;
 		return true;
 	}
 	
@@ -208,26 +218,23 @@ public class Radio {
 			secondaryDir = dynamicDir;
 		}
 	}
-
-	public void allPlaySong(boolean updateDirectory) {
+	
+	private void playSong(boolean updateDirectory){
+		if(call == null){
+			return;
+		}
 		if (updateDirectory) {
 			updateDir();
 		}
-		for(int i=0; i<calls.length; i++){
-			playSong(i);
-		}
-	}
-	
-	private void playSong(int callerID){
 		File f = getTrackPath();
 		try {
-			if(callActive(calls[callerID])){
-				calls[callerID].setFileInput(f);
+			if(isActive(call)){
+				call.setFileInput(f);
 			}else{
 				resetRadio();
 			}
 		} catch (SkypeException e) {
-			System.out.println("Failed to attach track at call ID " + callerID + " at track " + f.getAbsolutePath());
+			System.out.println("Failed to attach track at call ID " + call.getId() + " at track " + f.getAbsolutePath());
 			e.printStackTrace();
 		}
 	}
@@ -241,7 +248,7 @@ public class Radio {
 		return f;
 	}
 	
-	public boolean callActive(Call call) throws SkypeException{
+	public boolean isActive(Call call) throws SkypeException{
 		Status status = call.getStatus();
 		if(status == Status.UNPLACED || status == Status.INPROGRESS || status == Status.RINGING || status == Status.ROUTING){
 			return true;
@@ -324,18 +331,10 @@ public class Radio {
 		return true;
 	}
 
-	public void songOver(String callID) {
-		int callerID = -1;
-		if(calls == null){
+	public void songOver() {
+		if(call == null){
 			return;
 		}
-		for(int i=0; i<calls.length; i++){
-			if(calls[i].getId().equals(callID)){
-				callerID = i;
-				break;
-			}
-		}
-		
 		if(mode.equals("repeat")){
 			checkSong();
 		}else if(mode.equals("shuffle")){
@@ -343,7 +342,7 @@ public class Radio {
 		}else if(mode.equals("linear")){
 			getNextTrack();
 		}
-		playSong(callerID);		
+		playSong(false);
 	}
 	
 	private void checkSong(){

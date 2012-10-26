@@ -1,0 +1,21 @@
+List of radio commands
+!radio on - Makes the bot await a call
+!radio off - Turns the radio off (please use this once done using the radio)
+!radio status - Tells you whether the radio is playing or not
+
+--Commands that require the radio to be playing
+
+!radio list - Lists all tracks/folders in a directory
+!radio play <id> - Plays a given track in a folder
+!radio load <id> - Loads a given directory in a folder
+!radio back - Goes to the previous directory
+!radio mode <mode> - Sets the radio to play tracks in a given mode
+	* Linear: Plays tracks in numerical order
+	* Repeat: Plays a given track indefinitely
+	* Shuffle: Plays a random song from the directory
+!radio get <property> - Outputs a given property
+	* Track - Which song is currently playing
+	* Dir - Which directory you are browsing/playing from
+	* Mode - Gets which mode is currently active
+	* Listeners - Gets how many people are listening to the radio
+!radio set - Sets the radio to use selected directory (not required)

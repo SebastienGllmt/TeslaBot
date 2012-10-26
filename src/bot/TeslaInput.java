@@ -29,10 +29,7 @@ public class TeslaInput {
 		cmd = input.split(" ");
 		if(cmd[0].equals("CHATMESSAGE")){
 			if(cmd.length==3){
-				for(int i=0; i<cmd.length; i++){
-					System.out.print(cmd[i]);
-				}
-				System.out.println();
+				System.out.println("Chat event occured");
 			}else{
 				try{
 					status = cmd[2] + " " + cmd[3];
@@ -51,15 +48,18 @@ public class TeslaInput {
 				if(cmd[3].equals("RINGING")){
 					try{
 						Call call = new Call(cmd[1]);
-						if(!radio.isPlaying()){
+						if(radio.isListening()){
+							radio.play(call);
+						}else if(radio.isPlaying() && !call.equals(radio.getCall())){
 							call.finish();
 						}
 					}catch(Exception e){
-					return;
+						e.printStackTrace();
+						return;
 					}
 				}else if(cmd[2].startsWith("VAA")){
 					if(cmd[3].equals("FALSE")){
-						radio.songOver(cmd[1]);
+						radio.songOver();
 					}
 				}
 			}
@@ -153,6 +153,7 @@ public class TeslaInput {
 				}else if(args[0].equals("!radio")){
 					if(args.length > 1 && args[1].equals("help")){
 						action.getFullFile("radioHelp.txt");
+						rtrn = "Help has been delivered to you personally.";
 					}else{
 						rtrn = radio.getCommand(args, msg.getChat());
 					}
