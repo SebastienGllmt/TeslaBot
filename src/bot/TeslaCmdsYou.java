@@ -117,7 +117,7 @@ public class TeslaCmdsYou {
 				names = names.concat(members[i].getFullName());
 			}
 		}
-		return "I spy with his little eye " + names;
+		return "I spy with my little eye " + names;
 	}
 	public String poke(String username) throws SkypeException{
 		getUserByName(username);
@@ -153,7 +153,7 @@ public class TeslaCmdsYou {
 		String exception = Exception(username, false);
 		if(!exception.equals("")){
 			if(exception.equals(username + " could not be found in this chat.")){
-				username = "Somebody that goes by the name of " + username;
+				//In case I ever want to use this
 			}else{
 				return exception;
 			}
@@ -165,7 +165,7 @@ public class TeslaCmdsYou {
 		}else if(rand==1){
 			msg = "slapped by a large trout";
 		}else if(rand==2){
-			msg = "the biggest slap of his life";
+			msg = "the biggest slap of their life";
 		}
 		return username + " just got " + msg + " courtesy of " + speaker;
 	}
@@ -303,7 +303,7 @@ public class TeslaCmdsYou {
 					contactMsg = contactMsg.replace("<user>", name);
 					try{
 						contacts.addFriend(name, contactMsg);
-						return "Tesla Bot could not find a user with the name " + name + " in this chat so I have added him from Skype's global list of contacts. Please make sure you have added the person using his username and not his display name.";
+						return "Tesla Bot could not find a user with the name " + name + " in this chat so I have added him from Skype's global list of contacts. Please make sure you have added the person using their username and not their display name.";
 					}catch (Exception e){
 						return "Tesla Bot tried to add " + name + " as a friend but failed. Are you sure you typed it in correctly? You also need to type in the username and not the dispaly name of the contact.";
 					}
@@ -366,7 +366,7 @@ public class TeslaCmdsYou {
 		}else if(temp.contains("whatever you specify")){
 			return speaker + " clearly misinterpreted the help file.";
 		}else{
-			return speaker + " is now done " + type + " and will spare you his cool stories.";
+			return speaker + " is now done " + type + " and will spare you their cool stories.";
 		}
 	}
 	public String imgurLink(String url) throws IOException, SkypeException{
@@ -448,7 +448,7 @@ public class TeslaCmdsYou {
 	private String Exception(String username, boolean selfAllowed) throws SkypeException{
 		if(targetID == -1){
 			if(username.length()==0){
-				return speaker + " stalks his pray as he awaits to strike.";
+				return speaker + " stalks their pray as he awaits to strike.";
 			}
 			return username + " could not be found in this chat.";
 		}else if(username.length() == 0 || (members[targetID].getFullName().equals(speaker) && !selfAllowed)){

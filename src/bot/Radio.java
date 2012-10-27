@@ -26,10 +26,10 @@ import com.skype.SkypeException;
 public class Radio {
 
 	private String mainDir = System.getProperty("user.dir") + "\\radio\\";
-	private String secondaryDir = "";
-	private String dynamicDir = "";
+	private String secondaryDir = "introSongs\\";
+	private String dynamicDir = "introSongs\\";
 	private String songTitle = "";
-	private String mode = "repeat";
+	private String mode = "linear";
 	private boolean playing = false;
 	private boolean isListening = false;
 	private Call call = null;
@@ -91,9 +91,6 @@ public class Radio {
 					getNextTrack();
 					playSong(false);
 					rtrn = "Now playing " + songTitle;
-				}else if(cmds[1].equals("set")){
-					updateDir();
-					rtrn = "Updated directory to " + getDirTitle(false);
 				}
 			}
 			if(cmds.length == 3){
@@ -185,8 +182,8 @@ public class Radio {
 		isListening = false;
 		songTitle = "";
 		mode = "repeat";
-		secondaryDir = "";
-		dynamicDir = "";
+		secondaryDir = "introSongs\\";
+		dynamicDir = "introSongs\\";
 		if(call == null){
 			return true;
 		}else{
@@ -203,11 +200,17 @@ public class Radio {
 	}
 
 	public boolean play(Call newCall) throws SkypeException {
-		System.out.println("Radio begin");
+		System.out.println("Radio waiting...");
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Radio start");
 		playing = true;
 		call = newCall;
 		call.answer();
-		songTitle = "callIntro.wav";
+		getRandomTrack();
 		playSong(false);
 		isListening = false;
 		return true;
@@ -264,6 +267,9 @@ public class Radio {
 		if(songs == null){
 			sb.append("No tracks found.");
 		}else{
+			if(!dynamicDir.isEmpty()){
+				sb.append("!radio back to go to previous directory.\n");
+			}
 			for (int i = 0; i < songs.length; i++) {
 				String trackID = Integer.toString(i);
 				if (trackID.length() == 1) {
