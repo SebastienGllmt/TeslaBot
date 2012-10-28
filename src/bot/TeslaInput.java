@@ -74,7 +74,7 @@ public class TeslaInput {
 					Chat newChat = new Chat(cmd[1]);
 					TeslaCmdsYou.addAllFriends(newChat, cmd[3], "");
 					if(newChat.getAllMembers().length > 2 || justAdded){
-						newChat.send(TeslaCmdsYou.getFileInfo("greetings.txt"));
+						newChat.send(TeslaCmdsYou.getFileInfo("txt\\greetings.txt"));
 					}
 				}else if(cmd[2].equals("MEMBERS")){
 					Chat newChat = new Chat(cmd[1]);
@@ -138,14 +138,14 @@ public class TeslaInput {
 					rtrn = "Apparently " + speaker + " thinks the name of the game is Pong-Ping. Everybody point and laugh.";
 				}
 				else if(args[0].equals("!quote")){
-					rtrn = action.getRndmLine("TeslaQuotes.txt");
+					rtrn = action.getRndmLine("txt\\TeslaQuotes.txt");
 				}else if(args[0].equals("!help")){
 					rtrn = "Help has been delivered to you personally.";
-					action.getFullFile("txtCmd.txt");
+					action.getFullFile("txt\\txtCmd.txt");
 				}else if(args[0].equals("!add")){
 					rtrn = action.addFriends(formName(args,1));
 				}else if(args[0].equals("!spam")){
-					rtrn = action.getRndmLine("spambot.txt");
+					rtrn = action.getRndmLine("txt\\spambot.txt");
 				}else if(args[0].equals("!notify")){
 					rtrn = action.notifyChats(formName(args,1));
 				}else if(args[0].equals("!done")){
@@ -157,7 +157,7 @@ public class TeslaInput {
 				}else if(args[0].equals("!choose")){
 					rtrn = action.choseElement(formName(args, 1));
 				}else if(args[0].equals("!conch")){
-					rtrn = action.getRndmLine("magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
+					rtrn = action.getRndmLine("txt\\magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
 				}else if(args[0].equals("!repeat")){
 					if(args.length >= 3){
 						rtrn = action.repeat(args[1], formName(args, 2));
@@ -167,7 +167,7 @@ public class TeslaInput {
 					
 				}else if(args[0].equals("!radio")){
 					if(args.length > 1 && args[1].equals("help")){
-						action.getFullFile("radioHelp.txt");
+						action.getFullFile("txt\\radioHelp.txt");
 						rtrn = "Help has been delivered to you personally.";
 					}else{
 						rtrn = radio.getCommand(args, msg.getChat(), action.isAdmin());

@@ -254,7 +254,7 @@ public class TeslaCmdsYou {
 	}
 	public static void addAllFriends(Chat chat, String adder, String members) throws IOException, SkypeException{
 		ContactList contacts = new ContactList();
-		String contactMsg = getFileInfo("addMessage.txt");
+		String contactMsg = getFileInfo("txt\\addMessage.txt");
 		contactMsg = contactMsg.replace("<friend>",adder);
 		ArrayList<User> users = new ArrayList<User>();
 		if(members.isEmpty()){
@@ -282,7 +282,7 @@ public class TeslaCmdsYou {
 	}
 	public String addFriends(String name) throws SkypeException, IOException{
 		ContactList contacts = new ContactList();
-		String contactMsg = getFileInfo("addMessage.txt");
+		String contactMsg = getFileInfo("txt\\addMessage.txt");
 		contactMsg = contactMsg.replace("<friend>",speaker);
 		try{
 			getUserByName(name);
@@ -342,7 +342,7 @@ public class TeslaCmdsYou {
 					}else if(formName.toLowerCase().equals("offline")){
 						chats[i].send("Tesla Bot shutting down...");
 					}else{
-						chats[i].send(getFileInfo("notify.txt"));
+						chats[i].send(getFileInfo("txt\\notify.txt"));
 					}
 				}
 			}
