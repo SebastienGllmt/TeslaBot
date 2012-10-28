@@ -54,8 +54,7 @@ public class TeslaInput {
 						Call call = new Call(cmd[1]);
 						if(radio.isListening()){
 							radio.play(call);
-						}else if(!call.equals(radio.getCall())){
-							System.out.println(call.getStatus().toString());
+						}else if(!call.equals(radio.getCall()) && call.getStatus() != Status.REFUSED){
 							call.finish();
 						}
 					}catch(Exception e){
@@ -70,11 +69,11 @@ public class TeslaInput {
 			}
 		}else if(cmd[0].equals("CHAT")){
 			try{
-				if(cmd[2].equals("ADDER") || justAdded==true){ //when somebody adds you to a chat
+				if(cmd[2].equals("ADDER") || justAdded){ //when somebody adds you to a chat
 					justAdded=false;
 					Chat newChat = new Chat(cmd[1]);
 					TeslaCmdsYou.addAllFriends(newChat, cmd[3], "");
-					if(newChat.getAllMembers().length > 2){
+					if(newChat.getAllMembers().length > 2 || justAdded){
 						newChat.send(TeslaCmdsYou.getFileInfo("greetings.txt"));
 					}
 				}else if(cmd[2].equals("MEMBERS")){
@@ -171,7 +170,7 @@ public class TeslaInput {
 						action.getFullFile("radioHelp.txt");
 						rtrn = "Help has been delivered to you personally.";
 					}else{
-						rtrn = radio.getCommand(args, msg.getChat());
+						rtrn = radio.getCommand(args, msg.getChat(), action.isAdmin());
 					}
 				}else if(args[0].equals("!summon")){
 					msg.getChat().openChat();
