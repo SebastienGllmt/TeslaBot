@@ -85,8 +85,12 @@ public class Radio {
 				if(cmds[1].equals("listen")){
 					rtrn = "Now listening in to radio.";
 					listenIn = true;
+					playSong(false);
 				}else if(cmds[1].equals("ignore")){
 					rtrn = "Now ignoring the radio.";
+					if(clip.isOpen()){
+						clip.close();
+					}
 					listenIn = false;
 				}
 			}
@@ -203,7 +207,7 @@ public class Radio {
 		playing = false;
 		isListening = false;
 		songTitle = "";
-		mode = "repeat";
+		mode = "linear";
 		secondaryDir = "introSongs\\";
 		dynamicDir = "introSongs\\";
 		listenIn = false;

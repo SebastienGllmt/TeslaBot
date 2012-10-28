@@ -21,9 +21,6 @@ public class TeslaInput {
 	private String[] cmd;
 	private boolean justAdded;
 	
-	//Roll 2d6;
-	//Send intro message if no message history (?)
-	
 	Radio radio = new Radio();
 	
 	public void getInput(String input) throws ConnectorException, SkypeException, IOException{
@@ -49,6 +46,9 @@ public class TeslaInput {
 			}
 		}else if(cmd[0].equals("CALL")){
 			if(cmd.length == 4){
+				if(cmd[3].equals("FINISHED")){
+					radio.resetRadio();
+				}
 				if(cmd[3].equals("RINGING")){
 					try{
 						Call call = new Call(cmd[1]);
