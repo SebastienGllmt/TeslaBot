@@ -369,6 +369,35 @@ public class TeslaCmdsYou {
 			return speaker + " is now done " + type + " and will spare you their cool stories.";
 		}
 	}
+	
+	public String repeat(String times, String message) throws SkypeException{
+		int amount;
+		boolean overload = false;
+		try{
+			amount = Integer.parseInt(times);
+		}catch(NumberFormatException e){
+			if(times.toLowerCase().equals("<times>")){
+				return "Times is not a valid number, not even in the New Roman numberical system.";
+			}
+			amount = -1;
+		}
+		if(amount <= 0){
+			return "mumbles incoherently.";
+		}else if(amount > 5){
+			amount = 5;
+			overload = true;
+		}
+		
+		StringBuilder sb = new StringBuilder("\n");
+		for(int i=0; i<amount-1; i++){
+			sb.append(message + "\n");
+		}
+		sb.append(message);
+		if(overload){
+			sb.append("\n" + "the messsage begins to fade until nobody can hear it.");
+		}
+		return sb.toString();
+	}
 	public String imgurLink(String url) throws IOException, SkypeException{
 		if(url.contains("/a/")){ //if the link is to an album
 			return "";
@@ -499,7 +528,20 @@ public class TeslaCmdsYou {
 	}
 
 	public String choseElement(String formName) {
-		String[] elements = formName.split(" ");
+		if(formName.isEmpty()){
+			return "You're not giving me many options here.";
+		}
+		String splitter;
+		if(formName.contains(",")){
+			if(formName.contains(", ")){
+				splitter = ", ";
+			}else{
+				splitter = ",";
+			}
+		}else{
+			splitter = " ";
+		}
+		String[] elements = formName.split(splitter);
 		int length = elements.length;
 		for(int i=0; i<length; i++){
 			if(elements[i].endsWith(",")){

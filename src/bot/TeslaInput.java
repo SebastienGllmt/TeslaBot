@@ -54,7 +54,7 @@ public class TeslaInput {
 						Call call = new Call(cmd[1]);
 						if(radio.isListening()){
 							radio.play(call);
-						}else if(!call.equals(radio.getCall()) && call.getStatus()!=Status.FINISHED){
+						}else if(!call.equals(radio.getCall())){
 							System.out.println(call.getStatus().toString());
 							call.finish();
 						}
@@ -151,10 +151,21 @@ public class TeslaInput {
 					rtrn = action.notifyChats(formName(args,1));
 				}else if(args[0].equals("!done")){
 					rtrn = action.doneAction(formName(args,1));
+				}else if(args[0].equals("easter")){
+					if(args.length > 1 && args[1].equals("egg")){
+						rtrn = "Whoa magical easter egg find.";
+					}
 				}else if(args[0].equals("!choose")){
 					rtrn = action.choseElement(formName(args, 1));
 				}else if(args[0].equals("!conch")){
 					rtrn = action.getRndmLine("magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
+				}else if(args[0].equals("!repeat")){
+					if(args.length >= 3){
+						rtrn = action.repeat(args[1], formName(args, 2));
+					}else{
+						rtrn = "Invalid format. Must be !repeat <times> <message>";
+					}
+					
 				}else if(args[0].equals("!radio")){
 					if(args.length > 1 && args[1].equals("help")){
 						action.getFullFile("radioHelp.txt");

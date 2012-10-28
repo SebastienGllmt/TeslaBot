@@ -8,6 +8,7 @@ List of commands
 !poke <username> - Sends a PM to a given user.
 !quote - Returns a random quote from Nikola Tesla.
 !radio - Type in "!radio help" for more information.
+!repeat <times> <message> - Repeats a messages a given number of times.
 !roll <number> - Returns a number from 1 to <number>.
 !search <text> - Returns a Google search of a given query.
 !slap <username> - Slaps a user in a random way to show him your discontent.
