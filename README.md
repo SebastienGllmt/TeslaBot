@@ -1,4 +1,4 @@
-TeslaBot
+Tesla Bot
 ========
 
 A Chat Bot For Skype
