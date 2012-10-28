@@ -36,14 +36,19 @@ public class Radio {
 
 	public String getCommand(String[] cmds, Chat chat) throws SkypeException{
 		String rtrn = "Invalid command or radio not running.";
+		if(cmds.length == 1){
+			cmds = new String[2];
+			cmds[0] = "!radio";
+			cmds[1] = "on";
+		}
 		if(cmds.length == 2){
 			if(cmds[1].equals("on")){
 				if(isListening){
-					rtrn = "Awaiting call.";
+					rtrn = "Awaiting call. !radio help for a list of commands.";
 				}else{
 					if(!playing){
 						isListening = true;
-						rtrn = "Awaiting call.";
+						rtrn = "Awaiting call. !radio helpf or a list of commands.";
 					}else{
 						rtrn = "Radio already on.";
 					}
@@ -117,10 +122,10 @@ public class Radio {
 								rtrn = "Directory shifted to " + dynamicDir;
 							}
 						}else{
-							rtrn = "Invalid use of " + command + ". Track or directory IDs must be used from !radio list";
+							rtrn = "Invalid use of " + command + ". Track or directory IDs must be used from !radio list. Use !radio play for tracks, !radio load for directories.";
 						}
 					}catch(NumberFormatException e){
-						rtrn = "Invalid track or directory.";	
+						rtrn = "Invalid track or directory. Be sure to use IDs and not names of tracks/folders.";	
 					}
 				}else if(cmds[1].equals("mode")){
 					boolean success = setMode(cmds[2]);
@@ -145,7 +150,7 @@ public class Radio {
 						}
 					}
 				}else{
-					rtrn = "Invalid use of command " + cmds[1] + cmds[2];
+					rtrn = "Invalid use of command " + cmds[1] + cmds[2] + ". Use !radio help for a list of commands.";
 				}
 			}
 		}

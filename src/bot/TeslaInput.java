@@ -11,6 +11,7 @@ import com.skype.ChatMessage;
 import com.skype.ContactList;
 import com.skype.Skype;
 import com.skype.SkypeException;
+import com.skype.Call.Status;
 import com.skype.connector.ConnectorException;
 
 public class TeslaInput {
@@ -53,8 +54,8 @@ public class TeslaInput {
 						Call call = new Call(cmd[1]);
 						if(radio.isListening()){
 							radio.play(call);
-						}else if(radio.isPlaying() && !call.equals(radio.getCall())){
-							System.out.println("END CALL");
+						}else if(!call.equals(radio.getCall()) && call.getStatus()!=Status.FINISHED){
+							System.out.println(call.getStatus().toString());
 							call.finish();
 						}
 					}catch(Exception e){
