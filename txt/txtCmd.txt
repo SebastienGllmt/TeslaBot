@@ -10,6 +10,7 @@ List of commands
 !radio - Type in "!radio help" for more information.
 !repeat <times> <message> - Repeats a messages a given number of times.
 !roll <number> - Returns a number from 1 to <number>.
+!roll <amount>d<sides> - Returns the total and the result of each roll.
 !search <text> - Returns a Google search of a given query.
 !slap <username> - Slaps a user in a random way to show him your discontent.
 !summon - Alerts the developer to come to your chat.

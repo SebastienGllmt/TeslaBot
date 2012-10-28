@@ -44,19 +44,25 @@ public class TeslaCmdsYou {
 			if(number.length()==0){
 				return speaker + " rolls around pointlessly.";
 			}else{
-				if(number.length()>=10){
+				if(number.length()>=8){
 					return speaker + " throws a sphere and it rolls away.";
 				}
 			}
+			if (number.equals("i")){
+				return speaker + " throws an imaginary dice through the plane.";
+			}
+			if (number.contains("d")){
+				return rollDD(number);
+			}
 			long nbr = Long.parseLong(number);
+			String exception = checkRollValue(nbr);
+			if(exception != null){
+				return exception;
+			}
 			String rand = Long.toString(Math.round(Math.random()*(nbr-1))+1);
-			if(nbr < 0){
-				msg = speaker + " throws dice all over the place";
-			}else if(nbr == 0){
-				msg = speaker + " rolls i on an imaginary die";
-			}else if(nbr==1){
+			if(nbr==1){
 				msg = speaker + " collapses time and space by rolling a 1-sided dice.";
-			}else if(nbr ==2){
+			}else if(nbr==2){
 				if(rand.equals("1")){
 					msg = speaker + " flips a coin and gets heads.";
 				}else{
@@ -69,6 +75,50 @@ public class TeslaCmdsYou {
 			msg = "Nice try, " + speaker;
 		}
 		return msg;
+	}
+	private String rollDD(String roll){
+		String[] rollInfo = roll.split("d");
+		long amount = Long.parseLong(rollInfo[0]);
+		long sides = Long.parseLong(rollInfo[1]);
+		
+		String[] exceptions = new String[2];
+		exceptions[0] = checkRollValue(amount);
+		exceptions[1] = checkRollValue(sides);
+		if(amount > 10){
+			return "Can not throw more than 10 die";
+		}
+		if(sides > 50){
+			return speaker + " throws a sphere and it rolls away";
+		}
+		if(exceptions[0] != null){
+			return exceptions[0];
+		}
+		if(exceptions[1] != null){
+			return exceptions[1];
+		}
+		int[] rolls = new int[(int) amount];
+		long total = 0;
+		StringBuilder sb = new StringBuilder(speaker + " rolls a sum of ");
+		for(int i=0; i<amount; i++){
+			long rollResult = (Math.round(Math.random()*(sides-1))+1);
+			rolls[i] = (int) rollResult;
+			total += rollResult;
+		}
+		sb.append(total + " consisting of ");
+		for(int i : rolls){
+			sb.append(i + " ");
+		}
+		return sb.toString();
+		
+	}
+	private String checkRollValue(long nbr){
+		String message = null;
+		if(nbr < 0){
+			message = speaker + " throws dice all over the place";
+		}else if(nbr == 0){
+			message = speaker + " rolls i on an imaginary die";
+		}
+		return message;
 	}
 	public String lastSeen(String username) throws SkypeException{
 		getUserByName(username);
@@ -386,6 +436,8 @@ public class TeslaCmdsYou {
 		}else if(amount > 5){
 			amount = 5;
 			overload = true;
+		}else if(message.length() > 140){
+			return "Sorry. 140 characters max!";
 		}
 		
 		StringBuilder sb = new StringBuilder("\n");
