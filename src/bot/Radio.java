@@ -2,7 +2,14 @@ package bot;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Random;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.skype.Call;
 import com.skype.Call.Status;
@@ -33,8 +40,10 @@ public class Radio {
 	private boolean playing = false;
 	private boolean isListening = false;
 	private Call call = null;
+	Clip clip = null;
+	private boolean listenIn = false;
 
-	public String getCommand(String[] cmds, Chat chat) throws SkypeException{
+	public String getCommand(String[] cmds, Chat chat, boolean isAdmin) throws SkypeException{
 		String rtrn = "Invalid command or radio not running.";
 		if(cmds.length == 1){
 			cmds = new String[2];
@@ -48,7 +57,7 @@ public class Radio {
 				}else{
 					if(!playing){
 						isListening = true;
-						rtrn = "Awaiting call. !radio helpf or a list of commands.";
+						rtrn = "Awaiting call. !radio help for a list of commands.";
 					}else{
 						rtrn = "Radio already on.";
 					}
@@ -71,6 +80,14 @@ public class Radio {
 					}else{
 						rtrn += ".";
 					}
+				}
+			}else if(isAdmin){
+				if(cmds[1].equals("listen")){
+					rtrn = "Now listening in to radio.";
+					listenIn = true;
+				}else if(cmds[1].equals("ignore")){
+					rtrn = "Now ignoring the radio.";
+					listenIn = false;
 				}
 			}
 		}
@@ -189,6 +206,11 @@ public class Radio {
 		mode = "repeat";
 		secondaryDir = "introSongs\\";
 		dynamicDir = "introSongs\\";
+		listenIn = false;
+		if(clip != null){
+			clip.stop();
+			clip = null;
+		}
 		if(call == null){
 			return true;
 		}else{
@@ -215,6 +237,11 @@ public class Radio {
 		playing = true;
 		call = newCall;
 		call.answer();
+		try {
+			clip = AudioSystem.getClip();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		}
 		getRandomTrack();
 		playSong(false);
 		isListening = false;
@@ -237,12 +264,26 @@ public class Radio {
 		File f = getTrackPath();
 		try {
 			if(isActive(call)){
+				if(clip.isOpen()){
+					clip.close();
+				}
+				if(listenIn){
+					AudioInputStream songClip = AudioSystem.getAudioInputStream(f);
+					clip.open(songClip);
+					clip.start();
+				}
 				call.setFileInput(f);
 			}else{
 				resetRadio();
 			}
 		} catch (SkypeException e) {
 			System.out.println("Failed to attach track at call ID " + call.getId() + " at track " + f.getAbsolutePath());
+			e.printStackTrace();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		}
 	}

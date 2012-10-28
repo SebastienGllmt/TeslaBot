@@ -458,6 +458,15 @@ public class TeslaCmdsYou {
 		}
 		return "";
 	}
+	public boolean isAdmin() throws SkypeException{
+		getUserByName(speaker);
+		String name = members[targetID].toString().toLowerCase();
+		if(name.equals("blackduck606") || name.equals("teslarobot")){
+			return true;
+		}else{
+			return false;
+		}
+	}
 	private boolean isAdmin(String name){
 		if(name.equals("blackduck606") || name.equals("teslarobot")){
 			return true;
