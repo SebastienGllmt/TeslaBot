@@ -44,6 +44,9 @@ public class Radio {
 	private boolean listenIn = false;
 
 	public String getCommand(String[] cmds, Chat chat, boolean isAdmin) throws SkypeException{
+		for(int i=0; i<cmds.length; i++){
+			cmds[i] = cmds[i].toLowerCase();
+		}
 		String rtrn = "Invalid command or radio not running.";
 		if(cmds.length == 1){
 			cmds = new String[2];
@@ -268,6 +271,7 @@ public class Radio {
 		File f = getTrackPath();
 		try {
 			if(isActive(call)){
+				System.out.println("Now playing " + songTitle);
 				if(clip.isOpen()){
 					clip.close();
 				}
