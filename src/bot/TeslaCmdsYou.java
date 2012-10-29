@@ -51,7 +51,7 @@ public class TeslaCmdsYou {
 			if (number.equals("i")){
 				return speaker + " throws an imaginary dice through the plane.";
 			}
-			if (number.contains("d")){
+			if (number.contains("d") || number.contains("D")){
 				return rollDD(number);
 			}
 			long nbr = Long.parseLong(number);
