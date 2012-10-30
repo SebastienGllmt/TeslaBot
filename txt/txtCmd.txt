@@ -2,12 +2,10 @@ List of commands
 !add <username> - Makes Tesla Bot add somebody as a friend. Make sure this is the person's username and not his display name.
 !choose - Choses a random element from a list.
 !conch - Get some advice on what to do brought to you by the Magic Conch.
-!done <type> - Use this when you're done a task, a bug, or anything else.
 !ping - Returns the ping in milliseconds of a user or website
 !poke <username> - Sends a PM to a given user.
 !quote - Returns a random quote from Nikola Tesla.
 !radio - Type in "!radio help" for more information.
-!repeat <times> <message> - Repeats a messages a given number of times.
 !roll <number> - Returns a number from 1 to <number>. Also accepts nDr format (ex: 5d4)
 !search <text> - Returns a Google search of a given query.
 !slap <username> - Slaps a user in a random way to show him your discontent.

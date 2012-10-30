@@ -400,56 +400,7 @@ public class TeslaCmdsYou {
 		}
 		return "You found a secret feature that you aren't allowed to use!";
 	}
-	public String doneAction(String type) throws SkypeException{
-		getUserByName(speaker);
-		String exception = Exception(speaker, true);
-		if(!exception.equals("")){
-			return exception;
-		}
-		String temp = type.toLowerCase();
-		if(type.equals("")){
-			return speaker + " is simply done.";
-		}else if(temp.equals("task")){
-			return speaker + " has completed yet another task!";
-		}else if(temp.equals("bug")){
-			return speaker + " has fixed yet another bug!";
-		}else if(temp.contains("whatever you specify")){
-			return speaker + " clearly misinterpreted the help file.";
-		}else{
-			return speaker + " is now done " + type + " and will spare you their cool stories.";
-		}
-	}
 	
-	public String repeat(String times, String message) throws SkypeException{
-		int amount;
-		boolean overload = false;
-		try{
-			amount = Integer.parseInt(times);
-		}catch(NumberFormatException e){
-			if(times.toLowerCase().equals("<times>")){
-				return "Times is not a valid number, not even in the New Roman numberical system.";
-			}
-			amount = -1;
-		}
-		if(amount <= 0){
-			return "mumbles incoherently.";
-		}else if(amount > 5){
-			amount = 5;
-			overload = true;
-		}else if(message.length() > 140){
-			return "Sorry. 140 characters max!";
-		}
-		
-		StringBuilder sb = new StringBuilder("\n");
-		for(int i=0; i<amount-1; i++){
-			sb.append(message + "\n");
-		}
-		sb.append(message);
-		if(overload){
-			sb.append("\n" + "the messsage begins to fade until nobody can hear it.");
-		}
-		return sb.toString();
-	}
 	public String imgurLink(String url) throws IOException, SkypeException{
 		if(url.contains("/a/")){ //if the link is to an album
 			return "";

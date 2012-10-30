@@ -70,12 +70,12 @@ public class TeslaInput {
 		}else if(cmd[0].equals("CHAT")){
 			try{
 				if(cmd[2].equals("ADDER") || justAdded){ //when somebody adds you to a chat
-					justAdded=false;
 					Chat newChat = new Chat(cmd[1]);
 					TeslaCmdsYou.addAllFriends(newChat, cmd[3], "");
 					if(newChat.getAllMembers().length > 2 || justAdded){
 						newChat.send(TeslaCmdsYou.getFileInfo("txt\\greetings.txt"));
 					}
+					justAdded=false;
 				}else if(cmd[2].equals("MEMBERS")){
 					Chat newChat = new Chat(cmd[1]);
 					TeslaCmdsYou.addAllFriends(newChat, "who has added you to a group chat I'm in", formName(cmd,3));
@@ -144,12 +144,8 @@ public class TeslaInput {
 					action.getFullFile("txt\\txtCmd.txt");
 				}else if(args[0].equals("!add")){
 					rtrn = action.addFriends(formName(args,1));
-				}else if(args[0].equals("!spam")){
-					rtrn = action.getRndmLine("txt\\spambot.txt");
 				}else if(args[0].equals("!notify")){
 					rtrn = action.notifyChats(formName(args,1));
-				}else if(args[0].equals("!done")){
-					rtrn = action.doneAction(formName(args,1));
 				}else if(args[0].equals("easter")){
 					if(args.length > 1 && args[1].equals("egg")){
 						rtrn = "Whoa magical easter egg find.";
@@ -158,13 +154,6 @@ public class TeslaInput {
 					rtrn = action.choseElement(formName(args, 1));
 				}else if(args[0].equals("!conch")){
 					rtrn = action.getRndmLine("txt\\magicconch.txt") + "\nTHE CONCH HAS SPOKEN";
-				}else if(args[0].equals("!repeat")){
-					if(args.length >= 3){
-						rtrn = action.repeat(args[1], formName(args, 2));
-					}else{
-						rtrn = "Invalid format. Must be !repeat <times> <message>";
-					}
-					
 				}else if(args[0].equals("!radio")){
 					if(args.length > 1 && args[1].equals("help")){
 						action.getFullFile("txt\\radioHelp.txt");
