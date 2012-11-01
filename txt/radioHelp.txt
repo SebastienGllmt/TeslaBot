@@ -18,4 +18,3 @@ List of radio commands
 	* Dir - Which directory you are browsing/playing from
 	* Mode - Gets which mode is currently active
 	* Listeners - Gets how many people are listening to the radio
-!radio set - Sets the radio to use selected directory (not required)
