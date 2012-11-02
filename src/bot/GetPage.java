@@ -16,7 +16,7 @@ public class GetPage {
      * the DOTALL flag accounts for sites that have
      * line feeds in the title text */
     private static final Pattern TITLE_TAG = Pattern.compile("\\<title>(.*?)\\</title>", Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
-    private static final Pattern AUTHOR_TAG = Pattern.compile("/user/(.*?)\">");
+    private static final Pattern AUTHOR_TAG = Pattern.compile("href=\"/user/(.*?)\"");
     private static final Pattern DURATION = Pattern.compile("itemprop=\"duration\" content=\"PT(.*?)S\">", Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
     private static final Pattern WIKIERROR = Pattern.compile("<b>Wikipedia does not have an article with this exact name.</b>");
     private static final Pattern TWEETMSG = Pattern.compile(",\"id\":(.*?),\"text\":\"(.*?)\",");
@@ -169,6 +169,8 @@ public class GetPage {
     	if(author.length()==0){
     		return "an unknown author.";
     	}
+    	int cutoff = author.indexOf("?");
+    	author = author.substring(0, cutoff);
     	return strReplace(author);
     }
     public String getDuration(){
