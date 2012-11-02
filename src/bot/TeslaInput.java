@@ -12,6 +12,8 @@ import com.skype.ContactList;
 import com.skype.Skype;
 import com.skype.SkypeException;
 import com.skype.Call.Status;
+import com.skype.User;
+import com.skype.User.BuddyStatus;
 import com.skype.connector.ConnectorException;
 
 public class TeslaInput {
@@ -140,7 +142,12 @@ public class TeslaInput {
 				else if(args[0].equals("!quote")){
 					rtrn = action.getRndmLine("txt\\TeslaQuotes.txt");
 				}else if(args[0].equals("!help")){
-					rtrn = "Help has been delivered to you personally.";
+					User user = action.getUserID(speaker);
+					if(user.getBuddyStatus() == BuddyStatus.ADDED){
+						rtrn = "Help has been delivered to you personally.";
+					}else{
+						rtrn = "Help was sent but may not be received as you are not friends with Tesla Bot.";
+					}
 					action.getFullFile("txt\\txtCmd.txt");
 				}else if(args[0].equals("!add")){
 					rtrn = action.addFriends(formName(args,1));

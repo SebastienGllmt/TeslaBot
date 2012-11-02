@@ -197,7 +197,7 @@ public class TeslaCmdsYou {
 	}
 	public String slap(String username) throws SkypeException{
 		if(username.length()==0 || username.toLowerCase().equals("self")){
-			return speaker + " slaps himself in confusion. Super effective!";
+			return speaker + " slaps themself in confusion. Super effective!";
 		}
 		getUserByName(username);
 		String exception = Exception(username, false);
@@ -347,7 +347,7 @@ public class TeslaCmdsYou {
 					if(nameMatch.find()){
 						return name + " is not a valid username. Usernames can only contain A-z 0-9 -_.";
 					}
-					if(contacts.getFriend(name)!=null){
+					if(contacts.getFriend(name) != null){
 						return name + " is already a friend of Tesla Bot.";
 					}
 					contactMsg = contactMsg.replace("<user>", name);
@@ -485,6 +485,10 @@ public class TeslaCmdsYou {
 			}
 		}
 		targetID = -1;
+	}
+	public User getUserID(String username) throws SkypeException{
+		getUserByName(username);
+		return members[targetID];
 	}
 	private String Exception(String username, boolean selfAllowed) throws SkypeException{
 		if(targetID == -1){
