@@ -1,4 +1,5 @@
 *.class
+*.wav
 
 # Package Files #
 *.jar
