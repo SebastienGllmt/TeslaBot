@@ -330,22 +330,22 @@ public class TeslaCmdsYou {
 			}
 		}
 	}
-	public String addFriends(String name) throws SkypeException, IOException{
+	public String addFriends(String adder, String name) throws SkypeException, IOException{
 		ContactList contacts = new ContactList();
 		String contactMsg = getFileInfo("txt\\addMessage.txt");
-		contactMsg = contactMsg.replace("<friend>",speaker);
+		contactMsg = contactMsg.replace("<friend>",adder);
 		try{
 			getUserByName(name);
 			String exception = Exception(name, true);
 			if(!exception.equals("")){
 				if(exception.contains("could not be found")){
 					if(name.length()>30){
-						return "This user most definitely does not exist.";
+						return "This user most definitely does not exist. Make sure you use the username and not the display name";
 					}
 					Pattern nameFormat = Pattern.compile("[^\\w\\-\\.]");
 					Matcher nameMatch = nameFormat.matcher(name);
 					if(nameMatch.find()){
-						return name + " is not a valid username. Usernames can only contain A-z 0-9 -_.";
+						return name + " is not a valid username. Make sure you use the username and not the display name. Usernames can only contain A-z 0-9 -_.";
 					}
 					if(contacts.getFriend(name) != null){
 						return name + " is already a friend of Tesla Bot.";

@@ -150,12 +150,22 @@ public class TeslaInput {
 					}
 					action.getFullFile("txt\\txtCmd.txt");
 				}else if(args[0].equals("!add")){
-					rtrn = action.addFriends(formName(args,1));
+					rtrn = action.addFriends(speaker, formName(args,1));
+				}else if(args[0].equals("!addas")){
+					if(args.length == 3){
+						if(action.isAdmin()){
+							rtrn = action.addFriends(args[1], args[2]);
+						}else{
+							rtrn = "You are not an admin and therefore can not use this command.";
+						}
+					}else{
+						rtrn = "Invalid use of command.";
+					}
 				}else if(args[0].equals("!notify")){
 					rtrn = action.notifyChats(formName(args,1));
 				}else if(args[0].equals("easter")){
 					if(args.length > 1 && args[1].equals("egg")){
-						rtrn = "Whoa magical easter egg find.";
+						rtrn = "Whoa! Magical easter egg!";
 					}
 				}else if(args[0].equals("!choose")){
 					rtrn = action.choseElement(formName(args, 1));

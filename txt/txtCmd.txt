@@ -1,6 +1,6 @@
 List of commands
 !add <username> - Makes Tesla Bot add somebody as a friend. Make sure this is the person's username and not his display name.
-!choose - Choses a random element from a list.
+!choose - Chooses a random element from a list.
 !conch - Get some advice on what to do brought to you by the Magic Conch.
 !ping - Returns the ping in milliseconds of a user or website
 !poke <username> - Sends a PM to a given user.
