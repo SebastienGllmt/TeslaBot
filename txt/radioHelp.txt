@@ -13,8 +13,10 @@ List of radio commands
 	* Linear: Plays tracks in numerical order
 	* Repeat: Plays a given track indefinitely
 	* Shuffle: Plays a random song from the directory
+	Ex) !radio mode shuffle
 !radio get <property> - Outputs a given property
 	* Track - Which song is currently playing
 	* Dir - Which directory you are browsing/playing from
 	* Mode - Gets which mode is currently active
 	* Listeners - Gets how many people are listening to the radio
+	Ex) !radio get track
