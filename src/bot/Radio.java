@@ -38,158 +38,158 @@ public class Radio {
 	private String songTitle = "";
 	private String mode = "linear";
 	private boolean playing = false;
-	private boolean isListening = false;
+	private boolean isListening = false; //whether or not the bot is listening for an incoming call to pickup
 	private Call call = null;
 	Clip clip = null;
 	private boolean listenIn = false;
 
-	public String getCommand(String[] cmds, Chat chat, boolean isAdmin) throws SkypeException{
-		for(int i=0; i<cmds.length; i++){
+	public String getCommand(String[] cmds, Chat chat, boolean isAdmin) throws SkypeException {
+		for (int i = 0; i < cmds.length; i++) {
 			cmds[i] = cmds[i].toLowerCase();
 		}
 		String rtrn = "Invalid command or radio not running.";
-		if(cmds.length == 1){
+		if (cmds.length == 1) {
 			cmds = new String[2];
 			cmds[0] = "!radio";
 			cmds[1] = "on";
 		}
-		if(cmds.length == 2){
-			if(cmds[1].equals("on")){
-				if(isListening){
+		if (cmds.length == 2) {
+			if (cmds[1].equals("on")) {
+				if (isListening) {
 					rtrn = "Awaiting call. !radio help for a list of commands.";
-				}else{
-					if(!playing){
+				} else {
+					if (!playing) {
 						isListening = true;
 						rtrn = "Awaiting call. !radio help for a list of commands.";
-					}else{
+					} else {
 						rtrn = "Radio already on.";
 					}
 				}
-			}else if(cmds[1].equals("off")){
+			} else if (cmds[1].equals("off")) {
 				boolean success = resetRadio();
-				if(success){
+				if (success) {
 					rtrn = "Radio stopped.";
-				}else{
+				} else {
 					rtrn = "Radio failed to stop.";
 				}
-			}else if(cmds[1].equals("status")){
+			} else if (cmds[1].equals("status")) {
 				rtrn = "Tesla Wireless Radio is currently ";
-				if(playing){
+				if (playing) {
 					rtrn += "online.";
-				}else{
+				} else {
 					rtrn += "offline";
-					if(isListening){
+					if (isListening) {
 						rtrn += " and listening.";
-					}else{
+					} else {
 						rtrn += ".";
 					}
 				}
-			}else if(isAdmin){
-				if(cmds[1].equals("listen")){
+			} else if (isAdmin) {
+				if (cmds[1].equals("listen")) {
 					rtrn = "Now listening in to radio.";
 					listenIn = true;
 					playSong(false);
-				}else if(cmds[1].equals("ignore")){
+				} else if (cmds[1].equals("ignore")) {
 					rtrn = "Now ignoring the radio.";
-					if(clip.isOpen()){
+					if (clip.isOpen()) {
 						clip.close();
 					}
 					listenIn = false;
 				}
 			}
 		}
-		if(isPlaying()){		
-			if(cmds.length == 2){
-				if(cmds[1].equals("list")){
+		if (isPlaying()) {
+			if (cmds.length == 2) {
+				if (cmds[1].equals("list")) {
 					rtrn = listDir();
-				}else if(cmds[1].equals("back")){
-					if(!dynamicDir.isEmpty()){
-						dynamicDir = dynamicDir.substring(0, dynamicDir.length()-1); //removes the backslash at the end
+				} else if (cmds[1].equals("back")) {
+					if (!dynamicDir.isEmpty()) {
+						dynamicDir = dynamicDir.substring(0, dynamicDir.length() - 1); //removes the backslash at the end
 					}
 					int index = dynamicDir.lastIndexOf("\\");
 					String msg;
-					if(index != -1){
+					if (index != -1) {
 						dynamicDir = dynamicDir.substring(0, index) + "\\";
 						msg = "Directory shifted to " + getDirTitle(true);
-					}else{
+					} else {
 						dynamicDir = "";
 						msg = "Directory shifted to root directory";
 					}
 					rtrn = msg;
-				}else if(cmds[1].equals("next")){
+				} else if (cmds[1].equals("next")) {
 					getNextTrack();
 					playSong(false);
 					rtrn = "Now playing " + songTitle;
 				}
 			}
-			if(cmds.length == 3){
+			if (cmds.length == 3) {
 				String command = cmds[1];
-				if(cmds[1].equals("play") || cmds[1].equals("load")){
+				if (cmds[1].equals("play") || cmds[1].equals("load")) {
 					int id;
-					try{
+					try {
 						id = Integer.parseInt(cmds[2]);
 						String[] list;
-						if(command.equals("play")){
+						if (command.equals("play")) {
 							list = getTracks(true);
-						}else{
+						} else {
 							list = getDirectories(true);
 						}
-						if(id < list.length && id >= 0){
-							if(command.equals("play")){
+						if (id < list.length && id >= 0) {
+							if (command.equals("play")) {
 								list = getTracks(true);
 								songTitle = list[id];
 								playSong(true);
 								rtrn = "Now playing " + songTitle;
-							}else{
+							} else {
 								list = getDirectories(true);
 								dynamicDir += list[id] + "\\";
 								rtrn = "Directory shifted to " + dynamicDir;
 							}
-						}else{
+						} else {
 							rtrn = "Invalid use of " + command + ". Track or directory IDs must be used from !radio list. Use !radio play for tracks, !radio load for directories.";
 						}
-					}catch(NumberFormatException e){
-						rtrn = "Invalid track or directory. Be sure to use IDs and not names of tracks/folders.";	
+					} catch (NumberFormatException e) {
+						rtrn = "Invalid track or directory. Be sure to use IDs and not names of tracks/folders.";
 					}
-				}else if(cmds[1].equals("mode")){
+				} else if (cmds[1].equals("mode")) {
 					boolean success = setMode(cmds[2]);
-					if(success){
+					if (success) {
 						rtrn = "Mode set to " + cmds[2];
-					}else{
+					} else {
 						rtrn = "Invalid mode.";
 					}
-				}else if(cmds[1].equals("get")){
-					if(cmds[2].equals("track")){
+				} else if (cmds[1].equals("get")) {
+					if (cmds[2].equals("track")) {
 						rtrn = songTitle + " is currently playing in " + getDirTitle(false);
-					}else if(cmds[2].equals("dir")){
+					} else if (cmds[2].equals("dir")) {
 						rtrn = "Currently playing from " + getDirTitle(false) + " and browsing through " + getDirTitle(true);
-					}else if(cmds[2].equals("mode")){
+					} else if (cmds[2].equals("mode")) {
 						rtrn = "Current mode: " + mode;
-					}else if(cmds[2].equals("listeners")){
-						int numCalls=Integer.parseInt(call.getParticipantsCount());
-						if(numCalls > 1){
+					} else if (cmds[2].equals("listeners")) {
+						int numCalls = Integer.parseInt(call.getParticipantsCount());
+						if (numCalls > 1) {
 							rtrn = "There are currently " + numCalls + " listeners.";
-						}else{
+						} else {
 							rtrn = "There is currently " + numCalls + " listener";
 						}
 					}
-				}else{
+				} else {
 					rtrn = "Invalid use of command " + cmds[1] + cmds[2] + ". Use !radio help for a list of commands.";
 				}
 			}
 		}
-			
+
 		return rtrn;
 	}
-	
-	private String getDirTitle(boolean dynamic){
+
+	private String getDirTitle(boolean dynamic) {
 		String dir;
-		if(dynamic){
+		if (dynamic) {
 			dir = dynamicDir;
-		}else{
+		} else {
 			dir = secondaryDir;
 		}
-		if(dir.isEmpty()){
+		if (dir.isEmpty()) {
 			dir = "root directory";
 		}
 		return dir;
@@ -198,10 +198,12 @@ public class Radio {
 	public boolean isPlaying() {
 		return playing;
 	}
-	public boolean isListening(){
+
+	public boolean isListening() {
 		return isListening;
 	}
-	public Call getCall(){
+
+	public Call getCall() {
 		return call;
 	}
 
@@ -214,15 +216,15 @@ public class Radio {
 		secondaryDir = "introSongs\\";
 		dynamicDir = "introSongs\\";
 		listenIn = false;
-		if(clip != null){
+		if (clip != null) {
 			clip.stop();
 			clip = null;
 		}
-		if(call == null){
+		if (call == null) {
 			return true;
-		}else{
+		} else {
 			try {
-				if(isActive(call)){
+				if (isActive(call)) {
 					call.hangup();
 				}
 			} catch (SkypeException e) {
@@ -254,15 +256,15 @@ public class Radio {
 		isListening = false;
 		return true;
 	}
-	
-	public void updateDir(){
+
+	public void updateDir() {
 		if (!secondaryDir.equals(dynamicDir)) {
 			secondaryDir = dynamicDir;
 		}
 	}
-	
-	private void playSong(boolean updateDirectory){
-		if(call == null){
+
+	private void playSong(boolean updateDirectory) {
+		if (call == null) {
 			return;
 		}
 		if (updateDirectory) {
@@ -270,18 +272,18 @@ public class Radio {
 		}
 		File f = getTrackPath();
 		try {
-			if(isActive(call)){
+			if (isActive(call)) {
 				System.out.println("Now playing " + songTitle);
-				if(clip.isOpen()){
+				if (clip.isOpen()) {
 					clip.close();
 				}
-				if(listenIn){
+				if (listenIn) {
 					AudioInputStream songClip = AudioSystem.getAudioInputStream(f);
 					clip.open(songClip);
 					clip.start();
 				}
 				call.setFileInput(f);
-			}else{
+			} else {
 				resetRadio();
 			}
 		} catch (SkypeException e) {
@@ -295,8 +297,8 @@ public class Radio {
 			e.printStackTrace();
 		}
 	}
-	
-	private File getTrackPath(){
+
+	private File getTrackPath() {
 		File f = new File(mainDir + secondaryDir + songTitle);
 		if (!f.exists()) {
 			System.out.println("Song does not exist at " + f.getAbsolutePath());
@@ -304,10 +306,10 @@ public class Radio {
 		}
 		return f;
 	}
-	
-	public boolean isActive(Call call) throws SkypeException{
+
+	public boolean isActive(Call call) throws SkypeException {
 		Status status = call.getStatus();
-		if(status == Status.UNPLACED || status == Status.INPROGRESS || status == Status.RINGING || status == Status.ROUTING){
+		if (status == Status.UNPLACED || status == Status.INPROGRESS || status == Status.RINGING || status == Status.ROUTING) {
 			return true;
 		}
 		return false;
@@ -318,10 +320,10 @@ public class Radio {
 		String[] files = getDirectories(true);
 
 		StringBuilder sb = new StringBuilder("Listing tracks..." + '\n');
-		if(songs == null){
+		if (songs == null) {
 			sb.append("No tracks found.");
-		}else{
-			if(!dynamicDir.isEmpty()){
+		} else {
+			if (!dynamicDir.isEmpty()) {
 				sb.append("!radio back to go to previous directory.\n");
 			}
 			for (int i = 0; i < songs.length; i++) {
@@ -332,7 +334,7 @@ public class Radio {
 				sb.append("Track " + trackID + " : " + songs[i] + '\n');
 			}
 		}
-		if(files != null){
+		if (files != null) {
 			for (int i = 0; i < files.length; i++) {
 				String folderID = Integer.toString(i);
 				if (folderID.length() == 1) {
@@ -348,9 +350,9 @@ public class Radio {
 
 	private String[] getTracks(boolean dynamic) {
 		File directory;
-		if(dynamic){
+		if (dynamic) {
 			directory = new File(mainDir + dynamicDir);
-		}else{
+		} else {
 			directory = new File(mainDir + secondaryDir);
 		}
 		String[] songs = directory.list(new FilenameFilter() {
@@ -364,9 +366,9 @@ public class Radio {
 
 	private String[] getDirectories(boolean dynamic) {
 		File directory;
-		if(dynamic){
+		if (dynamic) {
 			directory = new File(mainDir + dynamicDir);
-		}else{
+		} else {
 			directory = new File(mainDir + secondaryDir);
 		}
 		String[] files = directory.list(new FilenameFilter() {
@@ -377,72 +379,72 @@ public class Radio {
 		});
 		return files;
 	}
-	
-	private boolean setMode(String setMode){
-		if(setMode.equalsIgnoreCase("repeat")){
+
+	private boolean setMode(String setMode) {
+		if (setMode.equalsIgnoreCase("repeat")) {
 			mode = setMode.toLowerCase();
-		}else if(setMode.equalsIgnoreCase("shuffle")){
+		} else if (setMode.equalsIgnoreCase("shuffle")) {
 			mode = setMode.toLowerCase();
-		}else if(setMode.equalsIgnoreCase("linear")){
+		} else if (setMode.equalsIgnoreCase("linear")) {
 			mode = setMode.toLowerCase();
-		}else{
+		} else {
 			return false;
 		}
 		return true;
 	}
 
 	public void songOver() {
-		if(call == null){
+		if (call == null) {
 			return;
 		}
-		if(mode.equals("repeat")){
+		if (mode.equals("repeat")) {
 			checkSong();
-		}else if(mode.equals("shuffle")){
+		} else if (mode.equals("shuffle")) {
 			getRandomTrack();
-		}else if(mode.equals("linear")){
+		} else if (mode.equals("linear")) {
 			getNextTrack();
 		}
 		playSong(false);
 	}
-	
-	private void checkSong(){
+
+	private void checkSong() {
 		String[] tracks = getTracks(false);
-		for(String track : tracks){
-			if(track.equals(songTitle)){
+		for (String track : tracks) {
+			if (track.equals(songTitle)) {
 				return;
 			}
 		}
 		songTitle = tracks[0];
 	}
-	
-	private void getRandomTrack(){
+
+	private void getRandomTrack() {
 		String[] tracks = getTracks(false);
-		if(tracks.length == 1){
+		if (tracks.length == 1) {
 			songTitle = tracks[0];
-		}else{
+		} else {
 			Random r = new Random();
 			int id;
-			do{
+			do {
 				id = r.nextInt(tracks.length);
-			}while(songTitle.equals(tracks[id]));
+			} while (songTitle.equals(tracks[id]));
 			songTitle = tracks[id];
 		}
 	}
-	
-	private void getNextTrack(){
+
+	private void getNextTrack() {
 		String[] tracks = getTracks(false);
-		int id=-1;
-		
-		for(int i=0; i<tracks.length-1; i++){
-			if(tracks[i].equals(songTitle)){
+		int id = -1;
+
+		for (int i = 0; i < tracks.length - 1; i++) {
+			if (tracks[i].equals(songTitle)) {
 				id = ++i;
 				break;
 			}
 		}
-		if(id == -1){
+		if (id == -1) {
 			id = 0;
 		}
-		
+
 		songTitle = tracks[id];
 	}
 
