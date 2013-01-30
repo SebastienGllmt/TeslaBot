@@ -44,7 +44,6 @@ public class TeslaCmdsYou {
 			} else {
 				if (number.length() >= 8) {
 					char c = number.charAt(0);
-					System.out.println((int)c);
 					if(c >= 48 && c <= 57){
 						return speaker + " throws a sphere and it rolls away.";
 					}else{
@@ -369,7 +368,6 @@ public class TeslaCmdsYou {
 			} else if (status.equals("DELETED")) {
 				return "I used to be friends with " + name + "but he broke my heart.";
 			}
-			System.out.println(status);
 			return "I ran into some sort of issue while trying to add " + name + "as a friend.";
 		} catch (Exception e) {
 			return "I could not find a user with that username.";
